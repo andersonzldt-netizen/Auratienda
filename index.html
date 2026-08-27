@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tienda de Ropa - Catálogo</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Encabezado de la tienda -->
+  <header>
+    <h1>Moda Urbana</h1>
+    <div class="cart-icon" onclick="toggleCart()">
+      🛒 Carrito (<span id="cart-count">0</span>)
+    </div>
+  </header>
+
+  <!-- Contenedor Principal -->
+  <main class="container">
+    <h2>Nuestra Colección</h2>
+
+    <!-- Barra de búsqueda y filtros -->
+    <div class="filter-container">
+      <input 
+        type="text" 
+        id="search-input" 
+        placeholder="Buscar prenda..." 
+        oninput="filterProducts()"
+      >
+      
+      <select id="category-select" onchange="filterProducts()">
+        <option value="todas">Todas las categorías</option>
+        <option value="Casacas">Casacas</option>
+        <option value="Polos">Polos</option>
+        <option value="Pantalones">Pantalones</option>
+        <option value="Poleras">Poleras</option>
+      </select>
+    </div>
+
+    <!-- Rejilla de Productos -->
+    <div id="product-grid" class="grid"></div>
+  </main>
+
+  <!-- Panel Desplegable del Carrito -->
+  <aside id="cart-modal" class="cart-modal hidden">
+    <div class="cart-content">
+      <button class="close-btn" onclick="toggleCart()">×</button>
+      
+      <div class="cart-header">
+        <h3>Tu Carrito</h3>
+        <!-- BOTÓN NUEVO: Vaciar Carrito Completo -->
+        <button class="clear-cart-btn" onclick="clearCart()">Vaciar todo</button>
+      </div>
+      
+      <!-- Lista de artículos -->
+      <ul id="cart-items"></ul>
+      
+      <div class="cart-summary">
+        <p>Total: <strong>S/ <span id="cart-total">0.00</span></strong></p>
+      </div>
+
+      <!-- Formulario de datos de envío y pago -->
+      <form id="checkout-form" class="checkout-form" onsubmit="sendWhatsAppOrder(event)">
+        <h4>Datos de Entrega</h4>
+        
+        <label for="customer-name">Nombre completo *</label>
+        <input type="text" id="customer-name" placeholder="Ej. Juan Pérez" required>
+
+        <label for="customer-address">Dirección de entrega *</label>
+        <input type="text" id="customer-address" placeholder="Ej. Av. Larco 123, dpto 201" required>
+
+        <label for="customer-notes">Referencia o Nota (Opcional)</label>
+        <input type="text" id="customer-notes" placeholder="Ej. Frente al parque / Timbre malogrado">
+
+        <label for="payment-method">Método de Pago *</label>
+        <select id="payment-method" required>
+          <option value="Yape / Plin">Yape / Plin</option>
+          <option value="Transferencia Bancaria (BCP/Interbank)">Transferencia Bancaria</option>
+          <option value="Efectivo contra entrega">Efectivo contra entrega</option>
+          <option value="Tarjeta de Débito/Crédito (POS)">Tarjeta (POS contra entrega)</option>
+        </select>
+
+        <button type="submit" class="checkout-btn">Confirmar Pedido por WhatsApp</button>
+      </form>
+    </div>
+  </aside>
+
+  <script src="script.js"></script>
+</body>
+</html>
