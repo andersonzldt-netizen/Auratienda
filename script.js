@@ -8,9 +8,9 @@ const products = [
     name: "Polo Camisero",
     category: "Polos",
     price: 65.00,
-    sizes: ["S", "M", "L", "XL"],
+    sizes: ["S", "M", "L"],
     colors: ["Vino", "Negro", "Blanco"],
-    image: "imagenes/polos/polocamisero.jpg" // <-- Ruta exacta comprobada
+    image: "polocamisero.jpg"
   },
   {
     id: 2,
