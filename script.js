@@ -1,4 +1,4 @@
-// Catálogo apuntando a tus imágenes locales subidas
+// Arreglo de productos apuntando a la imagen subida en el repositorio
 const products = [
     {
         id: 1,
@@ -6,7 +6,7 @@ const products = [
         price: 75.00,
         category: "polos",
         badge: "DESTACADO",
-        image: "polocamisero.jpg", // Usa tu imagen local subida al repo
+        image: "polocamisero.jpg", // Usa el archivo subido
         sizes: ["S", "M", "L"],
         colors: ["Blanco", "Negro", "Beige"]
     }
@@ -203,7 +203,7 @@ checkoutForm.addEventListener('submit', (e) => {
 
     message += `\n💰 *Total a Pagar:* ${total}`;
 
-    const phone = "51987654321"; // Reemplaza con tu número de teléfono de contacto
+    const phone = "51987654321";
     const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
 
     window.open(whatsappUrl, '_blank');
