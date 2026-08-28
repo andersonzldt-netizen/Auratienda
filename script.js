@@ -1,4 +1,4 @@
-// Arreglo de productos apuntando a la imagen subida en el repositorio
+// Catálogo utilizando imágenes estables de la web
 const products = [
     {
         id: 1,
@@ -6,9 +6,29 @@ const products = [
         price: 75.00,
         category: "polos",
         badge: "DESTACADO",
-        image: "polocamisero.jpg", // Usa el archivo subido
+        image: "https://images.unsplash.com/photo-1625910513413-71239634e9e4?auto=format&fit=crop&w=500&q=80",
         sizes: ["S", "M", "L"],
         colors: ["Blanco", "Negro", "Beige"]
+    },
+    {
+        id: 2,
+        title: "Falda Asimétrica",
+        price: 85.00,
+        category: "faldas",
+        badge: "NUEVO",
+        image: "https://images.unsplash.com/photo-1583496661160-fb5886a0aaaa?auto=format&fit=crop&w=500&q=80",
+        sizes: ["S", "M", "L"],
+        colors: ["Negro", "Vino", "Blanco"]
+    },
+    {
+        id: 3,
+        title: "Blusa con Detalles",
+        price: 65.00,
+        category: "blusas",
+        badge: "MÁS VENDIDO",
+        image: "https://images.unsplash.com/photo-1564257631407-4deb1f99d992?auto=format&fit=crop&w=500&q=80",
+        sizes: ["S", "M"],
+        colors: ["Marfil", "Azul Marino"]
     }
 ];
 
@@ -203,7 +223,7 @@ checkoutForm.addEventListener('submit', (e) => {
 
     message += `\n💰 *Total a Pagar:* ${total}`;
 
-    const phone = "51987654321";
+    const phone = "51987654321"; // Reemplaza con tu número de WhatsApp
     const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
 
     window.open(whatsappUrl, '_blank');
