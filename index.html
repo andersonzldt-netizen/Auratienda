@@ -1,91 +1,70 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aura Boutique - Catálogo</title>
-  <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AURA Boutique - Catálogo</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
 </head>
 <body>
 
-  <!-- Encabezado de la tienda -->
-  <header>
-    <h1>Aura Boutique</h1>
-    <div class="cart-icon" onclick="toggleCart()">
-      🛒 Carrito (<span id="cart-count">0</span>)
-    </div>
-  </header>
+    <!-- Encabezado con marca centrada -->
+    <header>
+        <div class="header-top">
+            <div class="logo-container">
+                <h1 class="logo">AURA</h1>
+                <p class="slogan">BOUTIQUE</p>
+                <p class="slogan-secundario">TU LUZ, TU ESTILO, TU ESENCIA</p>
+            </div>
+            
+            <!-- Botón flotante del Carrito -->
+            <button id="cart-btn" class="cart-icon-btn">
+                🛒 Carrito (<span id="cart-count">0</span>)
+            </button>
+        </div>
+    </header>
 
-  <!-- Contenedor Principal -->
-  <main class="container">
-    <h2>Nuestra Colección</h2>
-
-    <!-- Barra de búsqueda y filtros -->
-    <div class="filter-container">
-      <input 
-        type="text" 
-        id="search-input" 
-        placeholder="Buscar prenda..." 
-        oninput="filterProducts()"
-      >
-      
-      <select id="category-select" onchange="filterProducts()">
-        <option value="todas">Todas las categorías</option>
-        <option value="Casacas">Casacas</option>
-        <option value="Polos">Polos</option>
-        <option value="Pantalones">Pantalones</option>
-        <option value="Poleras">Poleras</option>
-      </select>
-    </div>
-
-    <!-- Rejilla de Productos -->
-    <div id="product-grid" class="grid"></div>
-  </main>
-
-  <!-- Panel Desplegable del Carrito -->
-  <aside id="cart-modal" class="cart-modal hidden">
-    <div class="cart-content">
-      <button class="close-btn" onclick="toggleCart()">×</button>
-      
-      <div class="cart-header">
-        <h3>Tu Carrito</h3>
-        <!-- BOTÓN NUEVO: Vaciar Carrito Completo -->
-        <button class="clear-cart-btn" onclick="clearCart()">Vaciar todo</button>
-      </div>
-      
-      <!-- Lista de artículos -->
-      <ul id="cart-items"></ul>
-      
-      <div class="cart-summary">
-        <p>Total: <strong>S/ <span id="cart-total">0.00</span></strong></p>
-      </div>
-
-      <!-- Formulario de datos de envío y pago -->
-      <form id="checkout-form" class="checkout-form" onsubmit="sendWhatsAppOrder(event)">
-        <h4>Datos de Entrega</h4>
+    <!-- Navegación: Búsqueda y Categorías -->
+    <nav class="nav-container">
+        <input type="search" id="search-input" placeholder="Buscar prendas exclusivas..." class="search-bar">
         
-        <label for="customer-name">Nombre completo *</label>
-        <input type="text" id="customer-name" placeholder="Ej. Juan Pérez" required>
+        <div class="categories-container" id="categories-container">
+            <button class="category-btn active" data-category="todos">Todos</button>
+            <button class="category-btn" data-category="faldas">Faldas</button>
+            <button class="category-btn" data-category="blusas">Blusas</button>
+            <button class="category-btn" data-category="vestidos">Vestidos</button>
+        </div>
+    </nav>
 
-        <label for="customer-address">Dirección de entrega *</label>
-        <input type="text" id="customer-address" placeholder="Ej. Av. Larco 123, dpto 201" required>
+    <!-- Contenedor de Productos -->
+    <main id="products-container" class="products-grid"></main>
 
-        <label for="customer-notes">Referencia o Nota (Opcional)</label>
-        <input type="text" id="customer-notes" placeholder="Ej. Frente al parque / Timbre malogrado">
-
-        <label for="payment-method">Método de Pago *</label>
-        <select id="payment-method" required>
-          <option value="Yape / Plin">Yape / Plin</option>
-          <option value="Transferencia Bancaria (BCP/Interbank)">Transferencia Bancaria</option>
-          <option value="Efectivo contra entrega">Efectivo contra entrega</option>
-          <option value="Tarjeta de Débito/Crédito (POS)">Tarjeta (POS contra entrega)</option>
-        </select>
-
-        <button type="submit" class="checkout-btn">Confirmar Pedido por WhatsApp</button>
-      </form>
+    <!-- Barra Lateral del Carrito -->
+    <div id="cart-sidebar" class="cart-sidebar">
+        <div class="cart-header">
+            <h2>Tu Carrito</h2>
+            <button id="close-cart" class="close-btn">&times;</button>
+        </div>
+        <div id="cart-items" class="cart-items">
+            <p class="empty-msg">El carrito está vacío</p>
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Total:</span>
+                <span id="cart-total-price">S/ 0.00</span>
+            </div>
+            <button id="whatsapp-checkout-btn" class="whatsapp-btn">
+                Pedir por WhatsApp 📱
+            </button>
+        </div>
     </div>
-  </aside>
 
-  <script src="script.js"></script>
+    <!-- Fondo Oscuro del Carrito -->
+    <div id="cart-overlay" class="cart-overlay"></div>
+
+    <script src="script.js" defer></script>
 </body>
 </html>

@@ -1,251 +1,289 @@
-// ==========================================
-// 1. BASE DE DATOS CON RUTAS REALES
-// ==========================================
-// Usamos la ruta exacta detectada: imagenes/polos/nombre_foto.jpg
-const products = [
-  {
-    id: 1,
-    name: "Polo Camisero",
-    category: "Polos",
-    price: 65.00,
-    sizes: ["S", "M", "L"],
-    colors: ["Vino", "Negro", "Blanco"],
-    image: "polocamisero.jpg"
-  },
-  {
-    id: 2,
-    name: "Casaca Denim Classic",
-    category: "Casacas",
-    price: 120.00,
-    sizes: ["S", "M", "L", "XL"],
-    colors: ["Azul", "Negro"],
-    image: "imagenes/polos/casaca.jpg" // Si tienes fotos en otras subcarpetas, cambia 'polos' por el nombre correspondiente
-  },
-  {
-    id: 3,
-    name: "Pantalón Cargo",
-    category: "Pantalones",
-    price: 95.00,
-    sizes: ["M", "L", "XL"],
-    colors: ["Beige", "Verde", "Negro"],
-    image: "imagenes/polos/pantalon.jpg"
-  },
-  {
-    id: 4,
-    name: "Polera Hooded",
-    category: "Poleras",
-    price: 110.00,
-    sizes: ["S", "M", "L"],
-    colors: ["Gris", "Negro"],
-    image: "imagenes/polos/polera.jpg"
-  }
+const PHONE_NUMBER = "51987654321"; 
+
+const productsData = [
+    {
+        id: 1,
+        name: "Falda Asimétrica",
+        category: "faldas",
+        price: 85.00,
+        badge: "Nuevo",
+        imageUrl: "https://images.unsplash.com/photo-1583496661160-fb5886a0aaaa?q=80&w=600&auto=format&fit=crop", 
+        variants: {
+            sizes: ["S", "M", "L"],
+            colors: [
+                { name: "Negro", hex: "#000000" },
+                { name: "Vino", hex: "#4a0414" },
+                { name: "Blanco", hex: "#ffffff" }
+            ]
+        }
+    },
+    {
+        id: 2,
+        name: "Blusa con detalles",
+        category: "blusas",
+        price: 65.00,
+        badge: "Más Vendido",
+        imageUrl: "https://images.unsplash.com/photo-1618244972963-dbee1a7edc95?q=80&w=600&auto=format&fit=crop",
+        variants: {
+            sizes: ["S", "M"],
+            colors: [
+                { name: "Beige", hex: "#f5f5dc" },
+                { name: "Azul Marino", hex: "#000080" }
+            ]
+        }
+    }
 ];
 
-let cart = [];
-const PHONE_NUMBER = "51999999999"; // Reemplaza con tu número de WhatsApp
-const FALLBACK_IMAGE = "https://via.placeholder.com/300x200?text=Imagen+No+Encontrada";
+// Cargar Carrito desde LocalStorage
+let cart = JSON.parse(localStorage.getItem('aura_cart')) || [];
+let selectedVariants = {};
 
-// ==========================================
-// 2. PERSISTENCIA EN LOCALSTORAGE
-// ==========================================
-function loadCartFromLocalStorage() {
-  const savedCart = localStorage.getItem('shopping_cart');
-  if (savedCart) {
-    cart = JSON.parse(savedCart);
-  }
+const container = document.getElementById('products-container');
+const cartSidebar = document.getElementById('cart-sidebar');
+const cartOverlay = document.getElementById('cart-overlay');
+const cartItemsContainer = document.getElementById('cart-items');
+const cartCount = document.getElementById('cart-count');
+const cartTotalPrice = document.getElementById('cart-total-price');
+const searchInput = document.getElementById('search-input');
+const shippingSelect = document.getElementById('shipping-select');
+
+function saveCart() {
+    localStorage.setItem('aura_cart', JSON.stringify(cart));
 }
 
-function saveCartToLocalStorage() {
-  localStorage.setItem('shopping_cart', JSON.stringify(cart));
+function showToast(message) {
+    const toastContainer = document.getElementById('toast-container');
+    if (!toastContainer) return;
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.innerText = message;
+    toastContainer.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
 }
 
-// ==========================================
-// 3. RENDERIZADO DEL CATÁLOGO
-// ==========================================
-function displayProducts(productsToRender) {
-  const grid = document.getElementById('product-grid');
-  
-  if (productsToRender.length === 0) {
-    grid.innerHTML = `<p style="grid-column: 1/-1; text-align: center;">No se encontraron prendas que coincidan con tu búsqueda.</p>`;
-    return;
-  }
+function renderProducts(productList = productsData) {
+    if (!container) return;
+    container.innerHTML = '';
 
-  grid.innerHTML = productsToRender.map(product => {
-    const sizeOptions = product.sizes.map(s => `<option value="${s}">${s}</option>`).join('');
-    const colorOptions = product.colors.map(c => `<option value="${c}">${c}</option>`).join('');
+    if (productList.length === 0) {
+        container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #888; margin-top: 30px;">No se encontraron prendas que coincidan con tu búsqueda.</p>';
+        return;
+    }
 
-    return `
-      <div class="product-card">
-        <img 
-          src="${product.image}" 
-          alt="${product.name}"
-          onerror="this.onerror=null; this.src='${FALLBACK_IMAGE}';"
-        >
-        <h3>${product.name}</h3>
-        <p class="price">S/ ${product.price.toFixed(2)}</p>
-        
-        <div class="product-options">
-          <select id="size-${product.id}">${sizeOptions}</select>
-          <select id="color-${product.id}">${colorOptions}</select>
-        </div>
+    productList.forEach(product => {
+        const card = document.createElement('div');
+        card.className = 'product-card';
 
-        <button class="add-btn" onclick="addToCart(${product.id})">Agregar al carrito</button>
-      </div>
-    `;
-  }).join('');
+        const badgeHTML = product.badge 
+            ? `<span class="badge ${product.badge.toLowerCase() === 'nuevo' ? 'nuevo' : ''}">${product.badge}</span>` 
+            : '';
+
+        const sizeOptionsHTML = product.variants.sizes.map(size =>
+            `<button class="size-btn" data-product-id="${product.id}" data-size="${size}">${size}</button>`
+        ).join('');
+
+        const colorOptionsHTML = product.variants.colors.map(color =>
+            `<button class="color-btn" style="background-color: ${color.hex}" data-product-id="${product.id}" data-color="${color.name}" title="${color.name}"></button>`
+        ).join('');
+
+        card.innerHTML = `
+            <div class="product-image-container">
+                ${badgeHTML}
+                <img src="${product.imageUrl}" alt="${product.name}">
+            </div>
+            <h3 class="product-name">${product.name}</h3>
+            <p class="product-price">S/ ${product.price.toFixed(2)}</p>
+            <div class="variants-container">
+                <div class="variant-section">
+                    <p class="variant-title">Talla</p>
+                    <div class="size-options">${sizeOptionsHTML}</div>
+                </div>
+                <div class="variant-section">
+                    <p class="variant-title">Color</p>
+                    <div class="color-options">${colorOptionsHTML}</div>
+                </div>
+            </div>
+            <button class="add-to-cart-btn" onclick="addToCart(${product.id})">Agregar al Carrito</button>
+        `;
+        container.appendChild(card);
+    });
 }
 
 function filterProducts() {
-  const searchTerm = document.getElementById('search-input').value.toLowerCase();
-  const selectedCategory = document.getElementById('category-select').value;
+    const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
+    const activeCategoryBtn = document.querySelector('.category-btn.active');
+    const activeCategory = activeCategoryBtn ? activeCategoryBtn.dataset.category : 'todos';
 
-  const filtered = products.filter(product => {
-    const matchesSearch = product.name.toLowerCase().includes(searchTerm);
-    const matchesCategory = (selectedCategory === "todas") || (product.category === selectedCategory);
-    return matchesSearch && matchesCategory;
-  });
+    const filtered = productsData.filter(product => {
+        const matchesCategory = activeCategory === 'todos' || product.category === activeCategory;
+        const matchesSearch = product.name.toLowerCase().includes(searchTerm);
+        return matchesCategory && matchesSearch;
+    });
 
-  displayProducts(filtered);
+    renderProducts(filtered);
 }
 
-// ==========================================
-// 4. GESTIÓN DEL CARRITO
-// ==========================================
+if (searchInput) searchInput.addEventListener('input', filterProducts);
+
+const categoriesContainer = document.getElementById('categories-container');
+if (categoriesContainer) {
+    categoriesContainer.addEventListener('click', (e) => {
+        if (e.target.classList.contains('category-btn')) {
+            document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+            e.target.classList.add('active');
+            filterProducts();
+        }
+    });
+}
+
+if (container) {
+    container.addEventListener('click', function(e) {
+        const target = e.target;
+        if (target.classList.contains('size-btn')) {
+            const productId = target.dataset.productId;
+            target.parentElement.querySelectorAll('.size-btn').forEach(btn => btn.classList.remove('selected'));
+            target.classList.add('selected');
+            
+            if (!selectedVariants[productId]) selectedVariants[productId] = {};
+            selectedVariants[productId].size = target.dataset.size;
+        }
+
+        if (target.classList.contains('color-btn')) {
+            const productId = target.dataset.productId;
+            target.parentElement.querySelectorAll('.color-btn').forEach(btn => btn.classList.remove('selected'));
+            target.classList.add('selected');
+
+            if (!selectedVariants[productId]) selectedVariants[productId] = {};
+            selectedVariants[productId].color = target.dataset.color;
+        }
+    });
+}
+
 function addToCart(productId) {
-  const product = products.find(p => p.id === productId);
-  const selectedSize = document.getElementById(`size-${productId}`).value;
-  const selectedColor = document.getElementById(`color-${productId}`).value;
+    const product = productsData.find(p => p.id === productId);
+    const variant = selectedVariants[productId];
 
-  const existingItem = cart.find(item => 
-    item.id === productId && 
-    item.selectedSize === selectedSize && 
-    item.selectedColor === selectedColor
-  );
+    if (!variant || !variant.size || !variant.color) {
+        alert("Por favor selecciona una talla y un color.");
+        return;
+    }
 
-  if (existingItem) {
-    existingItem.quantity += 1;
-  } else {
     const cartItem = {
-      ...product,
-      selectedSize: selectedSize,
-      selectedColor: selectedColor,
-      quantity: 1,
-      cartItemId: Date.now()
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        size: variant.size,
+        color: variant.color
     };
+
     cart.push(cartItem);
-  }
-
-  saveCartToLocalStorage();
-  updateCartUI();
-}
-
-function changeQuantity(cartItemId, delta) {
-  const item = cart.find(i => i.cartItemId === cartItemId);
-  if (!item) return;
-
-  item.quantity += delta;
-
-  if (item.quantity <= 0) {
-    cart = cart.filter(i => i.cartItemId !== cartItemId);
-  }
-
-  saveCartToLocalStorage();
-  updateCartUI();
-}
-
-function clearCart() {
-  if (cart.length === 0) {
-    alert("El carrito ya está vacío.");
-    return;
-  }
-
-  if (confirm("¿Estás seguro de que deseas vaciar todo el carrito?")) {
-    cart = [];
-    saveCartToLocalStorage();
+    saveCart();
     updateCartUI();
-  }
+    showToast(`¡${product.name} agregada al carrito! ✨`);
 }
 
 function updateCartUI() {
-  const totalItemsCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-  document.getElementById('cart-count').innerText = totalItemsCount;
-  
-  const cartList = document.getElementById('cart-items');
-  
-  if (cart.length === 0) {
-    cartList.innerHTML = '<li>El carrito está vacío.</li>';
-  } else {
-    cartList.innerHTML = cart.map(item => `
-      <li style="margin-bottom: 10px;">
-        <strong>${item.name}</strong><br>
-        Talla: ${item.selectedSize} | Color: ${item.selectedColor}<br>
-        Precio unitario: S/ ${item.price.toFixed(2)}<br>
-        
-        <div class="quantity-controls">
-          <span>Cantidad:</span>
-          <button class="qty-btn" onclick="changeQuantity(${item.cartItemId}, -1)">-</button>
-          <span class="qty-number">${item.quantity}</span>
-          <button class="qty-btn" onclick="changeQuantity(${item.cartItemId}, 1)">+</button>
-          <span style="margin-left: auto; font-weight: bold;">Subtotal: S/ ${(item.price * item.quantity).toFixed(2)}</span>
-        </div>
+    if (!cartCount || !cartItemsContainer || !cartTotalPrice) return;
+    
+    cartCount.innerText = cart.length;
+    cartItemsContainer.innerHTML = '';
 
-        <hr style="border: 0; border-top: 1px solid #eee; margin: 8px 0;">
-      </li>
-    `).join('');
-  }
+    if (cart.length === 0) {
+        cartItemsContainer.innerHTML = '<p class="empty-msg">El carrito está vacío</p>';
+        cartTotalPrice.innerText = 'S/ 0.00';
+        return;
+    }
 
-  const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  document.getElementById('cart-total').innerText = total.toFixed(2);
+    let subtotal = 0;
+    cart.forEach((item, index) => {
+        subtotal += item.price;
+        const itemElement = document.createElement('div');
+        itemElement.className = 'cart-item';
+        itemElement.innerHTML = `
+            <div class="cart-item-info">
+                <h4>${item.name}</h4>
+                <p>Talla: ${item.size} | Color: ${item.color}</p>
+                <p><strong>S/ ${item.price.toFixed(2)}</strong></p>
+            </div>
+            <button class="remove-item-btn" onclick="removeFromCart(${index})">&times;</button>
+        `;
+        cartItemsContainer.appendChild(itemElement);
+    });
+
+    const shippingCost = parseFloat(shippingSelect ? shippingSelect.value : 0);
+    const total = subtotal + shippingCost;
+
+    cartTotalPrice.innerText = `S/ ${total.toFixed(2)}`;
 }
 
-function toggleCart() {
-  document.getElementById('cart-modal').classList.toggle('hidden');
+if (shippingSelect) {
+    shippingSelect.addEventListener('change', updateCartUI);
 }
 
-// ==========================================
-// 5. ENVIAR A WHATSAPP
-// ==========================================
-function sendWhatsAppOrder(event) {
-  event.preventDefault();
-
-  if (cart.length === 0) {
-    alert("Tu carrito está vacío. Agrega algunos productos antes de realizar el pedido.");
-    return;
-  }
-
-  const name = document.getElementById('customer-name').value.trim();
-  const address = document.getElementById('customer-address').value.trim();
-  const notes = document.getElementById('customer-notes').value.trim();
-  const paymentMethod = document.getElementById('payment-method').value;
-
-  let message = `*NUEVO PEDIDO - MODA URBANA*\n\n`;
-  message += `👤 *Cliente:* ${name}\n`;
-  message += `📍 *Dirección:* ${address}\n`;
-  if (notes) {
-    message += `📝 *Referencia:* ${notes}\n`;
-  }
-  message += `💳 *Método de Pago:* ${paymentMethod}\n`;
-
-  message += `\n*Detalle de la compra:*\n`;
-  cart.forEach((item, index) => {
-    const subtotal = item.price * item.quantity;
-    message += `${index + 1}. ${item.name} [x${item.quantity}] (Talla: ${item.selectedSize}, Color: ${item.selectedColor}) - Subtotal: S/ ${subtotal.toFixed(2)}\n`;
-  });
-
-  const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  message += `\n💰 *Total a pagar:* S/ ${total.toFixed(2)}`;
-
-  const encodedMessage = encodeURIComponent(message);
-  window.open(`https://wa.me/${PHONE_NUMBER}?text=${encodedMessage}`, '_blank');
+function removeFromCart(index) {
+    cart.splice(index, 1);
+    saveCart();
+    updateCartUI();
 }
 
-// ==========================================
-// 6. INICIALIZACIÓN
-// ==========================================
-function initApp() {
-  loadCartFromLocalStorage();
-  displayProducts(products);
-  updateCartUI();
+function openCart() {
+    if (cartSidebar && cartOverlay) {
+        cartSidebar.classList.add('open');
+        cartOverlay.classList.add('open');
+    }
 }
 
-initApp();
+function closeCart() {
+    if (cartSidebar && cartOverlay) {
+        cartSidebar.classList.remove('open');
+        cartOverlay.classList.remove('open');
+    }
+}
+
+const cartBtn = document.getElementById('cart-btn');
+const closeCartBtn = document.getElementById('close-cart');
+
+if (cartBtn) cartBtn.addEventListener('click', openCart);
+if (closeCartBtn) closeCartBtn.addEventListener('click', closeCart);
+if (cartOverlay) cartOverlay.addEventListener('click', closeCart);
+
+// MODAL GUÍA DE TALLAS
+const sizeModal = document.getElementById('size-modal');
+const sizeGuideBtn = document.getElementById('size-guide-btn');
+const closeSizeModal = document.getElementById('close-size-modal');
+
+if (sizeGuideBtn) sizeGuideBtn.addEventListener('click', () => sizeModal.classList.add('open'));
+if (closeSizeModal) closeSizeModal.addEventListener('click', () => sizeModal.classList.remove('open'));
+
+// CHECKOUT WHATSAPP
+const checkoutBtn = document.getElementById('whatsapp-checkout-btn');
+if (checkoutBtn) {
+    checkoutBtn.addEventListener('click', () => {
+        if (cart.length === 0) {
+            alert("El carrito está vacío.");
+            return;
+        }
+
+        let message = "¡Hola AURA Boutique! ✨ Quiero realizar el siguiente pedido:\n\n";
+        let subtotal = 0;
+
+        cart.forEach((item, i) => {
+            message += `${i + 1}. *${item.name}*\n   - Talla: ${item.size}\n   - Color: ${item.color}\n   - Precio: S/ ${item.price.toFixed(2)}\n\n`;
+            subtotal += item.price;
+        });
+
+        const shippingCost = parseFloat(shippingSelect ? shippingSelect.value : 0);
+        const shippingText = shippingSelect.options[shippingSelect.selectedIndex].text;
+        const total = subtotal + shippingCost;
+
+        message += `*Método de envío:* ${shippingText}\n`;
+        message += `*Total a pagar: S/ ${total.toFixed(2)}*`;
+
+        const encodedMessage = encodeURIComponent(message);
+        window.open(`https://wa.me/${PHONE_NUMBER}?text=${encodedMessage}`, '_blank');
+    });
+}
+
+// Carga Inicial
+renderProducts();
+updateCartUI();
