@@ -4,102 +4,143 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AURA Boutique - Catálogo</title>
-    <!-- Vincula directamente a estilo.css -->
-    <link rel="stylesheet" href="estilo.css">
+    
+    <!-- Precarga de fuentes de Google -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- Encabezado / Header -->
-    <header class="main-header">
-        <div class="header-content">
-            <img src="logo.png"
-                class="brand-logo">
-            <p class="tagline">TU LUZ, TU ESTILO, TU ESENCIA</p>
+    <!-- Encabezado Principal -->
+    <header>
+        <div class="header-top">
+            <div class="logo-container">
+                <img src="logo.png" alt="AURA Boutique - Logo" class="logo-img" width="220" height="auto">
+                <p class="slogan-secundario">TU LUZ, TU ESTILO, TU ESENCIA</p>
+            </div>
+            
+            <button id="cart-btn" class="cart-icon-btn" aria-label="Ver carrito de compras">
+                🛒 Carrito (<span id="cart-count">0</span>)
+            </button>
         </div>
-        <button id="cart-toggle-btn" class="cart-btn">
-            🛒 Carrito (<span id="cart-count">0</span>)
-        </button>
     </header>
 
-    <!-- Barra de Búsqueda y Filtros -->
-    <section class="controls-section">
-        <div class="search-box">
-            <input type="text" id="search-input" placeholder="Buscar prendas exclusivas...">
-        </div>
-        <div class="category-filters">
-            <button class="filter-btn active" data-category="todos">Todos</button>
-            <button class="filter-btn" data-category="polos">Polos</button>
-            <button class="filter-btn" data-category="faldas">Faldas</button>
-            <button class="filter-btn" data-category="blusas">Blusas</button>
-        </div>
-    </section>
-
-    <!-- Contenedor del Catálogo -->
-    <main class="catalog-container" id="product-grid">
-        <!-- Los productos se cargan desde script.js -->
-    </main>
-
-    <!-- Panel Lateral del Carrito -->
-    <aside id="cart-sidebar" class="cart-sidebar">
-        <div class="cart-header">
-            <h2>Tu Carrito</h2>
-            <button id="close-cart-btn" class="close-btn">&times;</button>
+    <!-- Navegación y Filtros -->
+    <nav class="nav-container" aria-label="Filtros de catálogo">
+        <div class="nav-actions">
+            <input type="search" id="search-input" placeholder="Buscar prendas exclusivas..." class="search-bar" aria-label="Buscar productos">
+            <button id="size-guide-btn" class="guide-btn">📏 Guía de Tallas</button>
         </div>
         
-        <div id="cart-items" class="cart-items-list">
-            <!-- Items agregados -->
+        <div class="categories-container" id="categories-container" role="tablist">
+            <button class="category-btn active" data-category="todos" role="tab" aria-selected="true">Todos</button>
+            <button class="category-btn" data-category="faldas" role="tab" aria-selected="false">Faldas</button>
+            <button class="category-btn" data-category="blusas" role="tab" aria-selected="false">Blusas</button>
+            <button class="category-btn" data-category="vestidos" role="tab" aria-selected="false">Vestidos</button>
+        </div>
+    </nav>
+
+    <!-- Contenedor Principal de Productos -->
+    <main id="products-container" class="products-grid" aria-live="polite"></main>
+
+    <!-- Sidebar del Carrito -->
+    <aside id="cart-sidebar" class="cart-sidebar" aria-label="Carrito de compras" aria-hidden="true">
+        <div class="cart-header">
+            <h2>Tu Carrito</h2>
+            <button id="close-cart" class="close-btn" aria-label="Cerrar carrito">&times;</button>
+        </div>
+
+        <div id="cart-items" class="cart-items">
+            <p class="empty-msg">El carrito está vacío</p>
         </div>
 
         <div class="cart-footer">
-            <form id="checkout-form" class="checkout-form">
-                <div class="form-group">
-                    <label for="client-name">NOMBRE Y APELLIDO:</label>
-                    <input type="text" id="client-name" placeholder="Ej. Ana García" required>
+            <form id="checkout-form" onsubmit="event.preventDefault();">
+                <div class="customer-info-section">
+                    <label for="customer-name">Nombre y Apellido:</label>
+                    <input type="text" id="customer-name" placeholder="Ej. Ana García" class="cart-input" autocomplete="name" required>
+
+                    <label for="customer-address">Dirección de Entrega:</label>
+                    <input type="text" id="customer-address" placeholder="Ej. Av. Balta 123, Chiclayo" class="cart-input" autocomplete="street-address" required>
                 </div>
-                <div class="form-group">
-                    <label for="client-address">DIRECCIÓN DE ENTREGA:</label>
-                    <input type="text" id="client-address" placeholder="Ej. Av. Larco 123, Trujillo" required>
-                </div>
-                <div class="form-group">
-                    <label for="shipping-method">MÉTODO DE ENVÍO:</label>
-                    <select id="shipping-method">
+
+                <div class="shipping-section">
+                    <label for="shipping-select">Método de Envío:</label>
+                    <select id="shipping-select" class="shipping-select">
                         <option value="0">Recojo en tienda (S/ 0.00)</option>
-                        <option value="10">Envío Local Trujillo (S/ 10.00)</option>
+                        <option value="8">Envío Local Chiclayo (S/ 8.00)</option>
                         <option value="18">Envío Nacional Provincias (S/ 18.00)</option>
                     </select>
                 </div>
-                
-                <div class="total-row">
+
+                <div class="cart-total">
                     <span>Total:</span>
-                    <strong id="cart-total-price">S/ 0.00</strong>
+                    <span id="cart-total-price">S/ 0.00</span>
                 </div>
 
-                <button type="submit" class="whatsapp-btn">
+                <button type="submit" id="whatsapp-checkout-btn" class="whatsapp-btn">
                     Pedir por WhatsApp 📱
                 </button>
             </form>
         </div>
     </aside>
 
-    <!-- Pie de Página -->
+    <!-- Modal Guía de Tallas -->
+    <div id="size-modal" class="modal" aria-hidden="true" role="dialog" aria-labelledby="modal-title">
+        <div class="modal-content">
+            <button id="close-size-modal" class="close-modal" aria-label="Cerrar guía de tallas">&times;</button>
+            <h3 id="modal-title">Guía de Tallas (cm)</h3>
+            <table class="size-table">
+                <thead>
+                    <tr>
+                        <th scope="col">Talla</th>
+                        <th scope="col">Busto</th>
+                        <th scope="col">Cintura</th>
+                        <th scope="col">Cadera</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>S</strong></td><td>84 - 88</td><td>64 - 68</td><td>90 - 94</td></tr>
+                    <tr><td><strong>M</strong></td><td>89 - 93</td><td>69 - 73</td><td>95 - 99</td></tr>
+                    <tr><td><strong>L</strong></td><td>94 - 98</td><td>74 - 78</td><td>100 - 104</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="toast-container" class="toast-container" aria-live="polite"></div>
+    <div id="cart-overlay" class="cart-overlay"></div>
+
+    <!-- Pie de Página / Footer -->
     <footer class="main-footer">
-        <div class="footer-grid">
-            <div class="footer-col">
-                <h3>AURA Boutique</h3>
-                <p>Tu luz, tu estilo, tu esencia.</p>
-                <p>📍 <strong>Ubicación:</strong> Trujillo, La Libertad - Perú</p>
-                <p>🚚 Envíos locales y a nivel nacional</p>
+        <div class="footer-container">
+            <div class="footer-brand">
+                <h2 class="footer-logo">AURA Boutique</h2>
+                <p class="footer-slogan">TU LUZ, TU ESTILO, TU ESENCIA</p>
             </div>
-            <div class="footer-col">
-                <h3>Atención al Cliente</h3>
-                <p>📱 <strong>WhatsApp:</strong> +51 987 654 321</p>
-                <p>🕒 <strong>Horario:</strong> Lun a Sáb: 9:00 AM - 8:00 PM</p>
+
+            <div class="footer-location">
+                <p class="footer-title">Ubicación</p>
+                <p class="location-detail">📍 Chiclayo, Perú</p>
+                <p class="location-sub">Envíos a todo el país</p>
             </div>
-            <div class="footer-col">
-                <h3>Síguenos y Pagos</h3>
-                <p>📸 Instagram: @auraboutique.pe</p>
-                <p>🎵 TikTok: @auraboutique</p>
-                <p>💳 <strong>Aceptamos:</strong> Yape, Plin y Transferencias</p>
+
+            <div class="footer-social">
+                <p class="footer-title">Síguenos en redes</p>
+                <div class="social-links">
+                    <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram de Aura Boutique" class="social-icon">
+                        <span>📸</span> Instagram
+                    </a>
+                    <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook de Aura Boutique" class="social-icon">
+                        <span>📘</span> Facebook
+                    </a>
+                    <a href="https://tiktok.com" target="_blank" rel="noopener noreferrer" aria-label="TikTok de Aura Boutique" class="social-icon">
+                        <span>🎵</span> TikTok
+                    </a>
+                </div>
             </div>
         </div>
         <div class="footer-bottom">
@@ -107,6 +148,6 @@
         </div>
     </footer>
 
-    <script src="script.js"></script>
+    <script src="script.js" defer></script>
 </body>
 </html>
