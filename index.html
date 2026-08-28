@@ -1,112 +1,115 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AURA Boutique - Catálogo</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AURA Boutique - Catálogo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="estilo.css">
 </head>
 <body>
 
-    <!-- Encabezado con Imagen de Logo Centrado -->
-    <header>
-        <div class="header-top">
-            <div class="logo-container">
-                <!-- Reemplaza "logo.png" por el nombre exacto de tu archivo de logo -->
-                <img src="logo.png" alt="AURA Boutique" class="logo-img">
-                <p class="slogan-secundario">TU LUZ, TU ESTILO, TU ESENCIA</p>
-            </div>
-            
-            <button id="cart-btn" class="cart-icon-btn">
-                🛒 Carrito (<span id="cart-count">0</span>)
-            </button>
-        </div>
-    </header>
-
-    <!-- Navegación: Búsqueda, Categorías y Guía de Tallas -->
-    <nav class="nav-container">
-        <div class="nav-actions">
-            <input type="search" id="search-input" placeholder="Buscar prendas exclusivas..." class="search-bar">
-            <button id="size-guide-btn" class="guide-btn">📏 Guía de Tallas</button>
-        </div>
-        
-        <div class="categories-container" id="categories-container">
-            <button class="category-btn active" data-category="todos">Todos</button>
-            <button class="category-btn" data-category="faldas">Faldas</button>
-            <button class="category-btn" data-category="blusas">Blusas</button>
-            <button class="category-btn" data-category="vestidos">Vestidos</button>
-        </div>
-    </nav>
-
-    <!-- Contenedor de Productos -->
-    <main id="products-container" class="products-grid"></main>
-
-    <!-- Barra Lateral del Carrito -->
-    <div id="cart-sidebar" class="cart-sidebar">
-        <div class="cart-header">
-            <h2>Tu Carrito</h2>
-            <button id="close-cart" class="close-btn">&times;</button>
-        </div>
-        <div id="cart-items" class="cart-items">
-            <p class="empty-msg">El carrito está vacío</p>
-        </div>
-        <div class="cart-footer">
-            <div class="customer-info-section">
-                <label for="customer-name">Nombre y Apellido:</label>
-                <input type="text" id="customer-name" placeholder="Ej. Ana García" class="cart-input">
-
-                <label for="customer-address">Dirección de Entrega:</label>
-                <input type="text" id="customer-address" placeholder="Ej. Av. Larco 123, Trujillo" class="cart-input">
-            </div>
-
-            <div class="shipping-section">
-                <label for="shipping-select">Método de Envío:</label>
-                <select id="shipping-select" class="shipping-select">
-                    <option value="0">Recojo en tienda (S/ 0.00)</option>
-                    <option value="10">Envío Local Trujillo (S/ 10.00)</option>
-                    <option value="18">Envío Nacional Provincias (S/ 18.00)</option>
-                </select>
-            </div>
-
-            <div class="cart-total">
-                <span>Total:</span>
-                <span id="cart-total-price">S/ 0.00</span>
-            </div>
-            <button id="whatsapp-checkout-btn" class="whatsapp-btn">
-                Pedir por WhatsApp 📱
-            </button>
-        </div>
+  <!-- Encabezado con Logo -->
+  <header>
+    <div class="header-top">
+      <div class="logo-container">
+        <img src="logo.png" alt="AURA Boutique" class="logo-img">
+        <p class="slogan-secundario">TU LUZ, TU ESTILO, TU ESENCIA</p>
+      </div>
+      <button id="cart-btn" class="cart-icon-btn">
+        🛒 Carrito (<span id="cart-count">0</span>)
+      </button>
     </div>
+  </header>
 
-    <!-- Modal Guía de Tallas -->
-    <div id="size-modal" class="modal">
-        <div class="modal-content">
-            <span id="close-size-modal" class="close-modal">&times;</span>
-            <h3>Guía de Tallas (cm)</h3>
-            <table class="size-table">
-                <thead>
-                    <tr>
-                        <th>Talla</th>
-                        <th>Busto</th>
-                        <th>Cintura</th>
-                        <th>Cadera</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr><td><strong>S</strong></td><td>84 - 88</td><td>64 - 68</td><td>90 - 94</td></tr>
-                    <tr><td><strong>M</strong></td><td>89 - 93</td><td>69 - 73</td><td>95 - 99</td></tr>
-                    <tr><td><strong>L</strong></td><td>94 - 98</td><td>74 - 78</td><td>100 - 104</td></tr>
-                </tbody>
-            </table>
-        </div>
+  <!-- Filtros y Búsqueda -->
+  <section class="toolbar">
+    <input type="text" id="search-input" placeholder="Buscar prendas exclusivas...">
+    <div class="filter-buttons">
+      <button class="filter-btn active" data-category="todos">Todos</button>
+      <button class="filter-btn" data-category="faldas">Faldas</button>
+      <button class="filter-btn" data-category="blusas">Blusas</button>
+      <button class="filter-btn" data-category="vestidos">Vestidos</button>
     </div>
+  </section>
 
-    <div id="toast-container" class="toast-container"></div>
-    <div id="cart-overlay" class="cart-overlay"></div>
+  <!-- Catálogo de Productos -->
+  <main class="catalog-grid" id="catalog-container">
+    <!-- Carga dinámica por script.js -->
+  </main>
 
-    <script src="script.js" defer></script>
+  <!-- Modal / Sección Carrito -->
+  <section id="cart-modal" class="cart-modal hidden">
+    <div class="cart-content">
+      <div class="cart-header">
+        <h2>Tu Carrito</h2>
+        <button id="close-cart-btn" class="close-btn">&times;</button>
+      </div>
+
+      <div id="cart-items" class="cart-items">
+        <!-- Carga dinámica de items -->
+      </div>
+
+      <div class="cart-form">
+        <label for="client-name">NOMBRE Y APELLIDO:</label>
+        <input type="text" id="client-name" placeholder="Ej. Ana García">
+
+        <label for="client-address">DIRECCIÓN DE ENTREGA:</label>
+        <input type="text" id="client-address" placeholder="Ej. Av. Larco 123, Trujillo">
+
+        <label for="shipping-method">MÉTODO DE ENVÍO:</label>
+        <select id="shipping-method">
+          <option value="0">Recojo en tienda (S/ 0.00)</option>
+          <option value="10">Envío Local Trujillo (S/ 10.00)</option>
+          <option value="18">Envío Nacional Provincias (S/ 18.00)</option>
+        </select>
+
+        <div class="cart-total">
+          <span>Total:</span>
+          <strong id="cart-total-price">S/ 0.00</strong>
+        </div>
+
+        <button id="whatsapp-btn" class="whatsapp-checkout-btn">
+          Pedir por WhatsApp 📱
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pie de Página (Atención, Garantías y Redes) -->
+  <footer class="footer-ubicacion">
+    <div class="footer-contenido">
+      <!-- Ubicación y Marca -->
+      <div class="footer-col">
+        <h3>AURA Boutique</h3>
+        <p class="slogan-footer">Tu luz, tu estilo, tu esencia.</p>
+        <p>📍 <strong>Ubicación:</strong> Trujillo, La Libertad - Perú</p>
+        <p>🚚 Envíos locales y a nivel nacional</p>
+      </div>
+
+      <!-- Atención al Cliente -->
+      <div class="footer-col">
+        <h3>Atención al Cliente</h3>
+        <p>📱 <strong>WhatsApp:</strong> +51 987 654 321</p>
+        <p>🕒 <strong>Horario:</strong> Lun a Sáb: 9:00 AM - 8:00 PM</p>
+        <p>💬 Respuestas rápidas e inmediatas</p>
+      </div>
+
+      <!-- Redes Sociales y Medios de Pago -->
+      <div class="footer-col">
+        <h3>Síguenos y Pagos</h3>
+        <p>📸 <strong>Instagram:</strong> <a href="https://www.instagram.com" target="_blank" class="social-link">@auraboutique.pe</a></p>
+        <p>🎵 <strong>TikTok:</strong> <a href="https://www.tiktok.com" target="_blank" class="social-link">@auraboutique</a></p>
+        <p>💳 <strong>Aceptamos:</strong> Yape, Plin y Transferencias</p>
+      </div>
+    </div>
+    <div class="footer-copy">
+      <p>&copy; 2026 AURA Boutique. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
 </body>
 </html>
