@@ -23,7 +23,7 @@ const productsData = [
         category: "blusas",
         price: 65.00,
         badge: "Más Vendido",
-        imageUrl: "https://images.unsplash.com/photo-1618244972963-dbee1a7edc95?q=80&w=600&auto=format&fit=crop",
+        imageUrl: "https://images.unsplash.com/photo-1564257631407-4deb1f99d992?q=80&w=600&auto=format&fit=crop",
         variants: {
             sizes: ["S", "M"],
             colors: [
@@ -34,7 +34,6 @@ const productsData = [
     }
 ];
 
-// Cargar Carrito desde LocalStorage
 let cart = JSON.parse(localStorage.getItem('aura_cart')) || [];
 let selectedVariants = {};
 
@@ -190,28 +189,25 @@ function updateCartUI() {
 
     if (cart.length === 0) {
         cartItemsContainer.innerHTML = '<p class="empty-msg">El carrito está vacío</p>';
-        cartTotalPrice.innerText = 'S/ 0.00';
-        return;
+    } else {
+        cart.forEach((item, index) => {
+            const itemElement = document.createElement('div');
+            itemElement.className = 'cart-item';
+            itemElement.innerHTML = `
+                <div class="cart-item-info">
+                    <h4>${item.name}</h4>
+                    <p>Talla: ${item.size} | Color: ${item.color}</p>
+                    <p><strong>S/ ${item.price.toFixed(2)}</strong></p>
+                </div>
+                <button class="remove-item-btn" onclick="removeFromCart(${index})">&times;</button>
+            `;
+            cartItemsContainer.appendChild(itemElement);
+        });
     }
 
-    let subtotal = 0;
-    cart.forEach((item, index) => {
-        subtotal += item.price;
-        const itemElement = document.createElement('div');
-        itemElement.className = 'cart-item';
-        itemElement.innerHTML = `
-            <div class="cart-item-info">
-                <h4>${item.name}</h4>
-                <p>Talla: ${item.size} | Color: ${item.color}</p>
-                <p><strong>S/ ${item.price.toFixed(2)}</strong></p>
-            </div>
-            <button class="remove-item-btn" onclick="removeFromCart(${index})">&times;</button>
-        `;
-        cartItemsContainer.appendChild(itemElement);
-    });
-
+    const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
     const shippingCost = parseFloat(shippingSelect ? shippingSelect.value : 0);
-    const total = subtotal + shippingCost;
+    const total = cart.length > 0 ? (subtotal + shippingCost) : 0;
 
     cartTotalPrice.innerText = `S/ ${total.toFixed(2)}`;
 }
@@ -252,10 +248,26 @@ const sizeModal = document.getElementById('size-modal');
 const sizeGuideBtn = document.getElementById('size-guide-btn');
 const closeSizeModal = document.getElementById('close-size-modal');
 
-if (sizeGuideBtn) sizeGuideBtn.addEventListener('click', () => sizeModal.classList.add('open'));
-if (closeSizeModal) closeSizeModal.addEventListener('click', () => sizeModal.classList.remove('open'));
+if (sizeGuideBtn && sizeModal) {
+    sizeGuideBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        sizeModal.classList.add('open');
+    });
+}
 
-// CHECKOUT WHATSAPP
+if (closeSizeModal && sizeModal) {
+    closeSizeModal.addEventListener('click', () => {
+        sizeModal.classList.remove('open');
+    });
+}
+
+window.addEventListener('click', (e) => {
+    if (e.target === sizeModal) {
+        sizeModal.classList.remove('open');
+    }
+});
+
+// CHECKOUT WHATSAPP CON DATOS DE CLIENTE
 const checkoutBtn = document.getElementById('whatsapp-checkout-btn');
 if (checkoutBtn) {
     checkoutBtn.addEventListener('click', () => {
@@ -264,9 +276,20 @@ if (checkoutBtn) {
             return;
         }
 
-        let message = "¡Hola AURA Boutique! ✨ Quiero realizar el siguiente pedido:\n\n";
-        let subtotal = 0;
+        const customerName = document.getElementById('customer-name').value.trim();
+        const customerAddress = document.getElementById('customer-address').value.trim();
 
+        if (!customerName || !customerAddress) {
+            alert("Por favor completa tu nombre y dirección de entrega.");
+            return;
+        }
+
+        let message = `¡Hola AURA Boutique! ✨ Quiero realizar el siguiente pedido:\n\n`;
+        message += `👤 *Cliente:* ${customerName}\n`;
+        message += `📍 *Dirección:* ${customerAddress}\n\n`;
+        message += `*Detalle de prendas:*\n`;
+
+        let subtotal = 0;
         cart.forEach((item, i) => {
             message += `${i + 1}. *${item.name}*\n   - Talla: ${item.size}\n   - Color: ${item.color}\n   - Precio: S/ ${item.price.toFixed(2)}\n\n`;
             subtotal += item.price;
